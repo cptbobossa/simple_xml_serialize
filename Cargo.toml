@@ -1,0 +1,14 @@
+[package]
+name = "simple_xml_serialize"
+version = "0.1.0"
+authors = ["cptbobossa <cptbobossa@protonmail.com>"]
+edition = "2018"
+readme = "README.md"
+license = "MIT"
+keywords = ["serialization","xml"]
+repository = "https://github.com/cptbobossa/simple_xml_serialize"
+description = "A Rust XML serialization library"
+categories = ["encoding"]
+include = ["LICENSE", ".gitignore", "Cargo.toml", "src/*.rs"]
+
+[dependencies]
