@@ -22,4 +22,4 @@ version = "0.15"
 features = ["full", "extra-traits"]
 
 [dev-dependencies]
-simple_xml_serialize = { path = "../" }
+simple_xml_serialize = { version = "0.1.0", path = "../" }
