@@ -1,6 +1,6 @@
 # Simple XML Serialization
 This is a Rust crate for serialization of data to XML. `XMLElement`s can either be built
-manually, or the `simple_xml_serialize_macro` crate can be used to generate `From` implementations for structs. 
+manually, or the [simple_xml_serialize_macro](https://crates.io/crates/simple_xml_serialize_macro) crate can be used to generate `From` implementations for structs. 
 
 ## Example Usage
 ```rust

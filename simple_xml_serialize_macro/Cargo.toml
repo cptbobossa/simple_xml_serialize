@@ -1,6 +1,6 @@
 [package]
 name = "simple_xml_serialize_macro"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["cptbobossa <cptbobossa@protonmail.com>"]
 edition = "2018"
 readme = "README.md"
@@ -22,7 +22,7 @@ version = "0.15"
 features = ["full", "extra-traits"]
 
 [dev-dependencies]
-simple_xml_serialize = { version = "0.2.0", path = "../" }
+simple_xml_serialize = { version = "0.2.1", path = "../" }
 
 [features]
 process_options = []

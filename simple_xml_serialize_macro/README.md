@@ -1,5 +1,5 @@
 # simple_xml_serialize_macro
-Using this proc_macro crate allows annotating structs with `#[xml_element("...")]` to generate `From` implementations of your struct to `XMLElement`. Individual fields are annotated with `sxs_type_attr`, `sxs_type_empty_attr`, `sxs_type_text`, `sxs_type_element`, and `sxs_type_multi_element`. Any fields not annotated are ignored.
+Using this proc_macro crate along with [simple_xml_serialize](https://crates.io/crates/simple_xml_serialize) allows annotating structs with `#[xml_element("...")]` to generate `From` implementations of your struct to `XMLElement`. Individual fields are annotated with `sxs_type_attr`, `sxs_type_empty_attr`, `sxs_type_text`, `sxs_type_element`, and `sxs_type_multi_element`. Any fields not annotated are ignored.
 
 ```rust
 extern crate simple_xml_serialize;
