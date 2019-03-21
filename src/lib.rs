@@ -6,7 +6,6 @@ pub struct XMLElement {
     contents: Option<Vec<XMLElement>>,
     text: Option<String>,
     attrs: Option<Vec<XMLAttr>>,
-    empty_attrs: Option<Vec<String>>,
 }
 
 impl fmt::Display for XMLElement {
@@ -23,12 +22,6 @@ impl fmt::Display for XMLElement {
                 ret.push('"');
                 ret.push_str(&a.value);
                 ret.push('"');
-            }
-        }
-        if let Some(ref empty_attrs) = self.empty_attrs {
-            for a in empty_attrs {
-                ret.push(' ');
-                ret.push_str(&a);
             }
         }
         if self.contents.is_none() && self.text.is_none() {
@@ -104,7 +97,6 @@ impl XMLElement {
             name: String::from(name),
             contents: None,
             attrs: None,
-            empty_attrs: None,
             text: None,
         }
     }
@@ -190,46 +182,6 @@ impl XMLElement {
             };
             attr_vec.push(new_attr);
             self.attrs = Some(attr_vec);
-        }
-    }
-
-    /// Builder pattern function for adding an empty attribute to the XMLElement
-    /// # Arguments
-    /// 
-    /// * `attr` - Any type that implements ToString; the name of the attribute
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// # use simple_xml_serialize::XMLElement;
-    /// let ele = XMLElement::new("name").empty_attr("empty");
-    /// assert_eq!(ele.to_string(), String::from("<name empty/>"));
-    /// ```
-    pub fn empty_attr(mut self, attr: impl ToString) -> Self {
-        self.add_empty_attr(attr);
-        self
-    }
-
-    /// Adds an empty attribute to the XMLElement
-    /// # Arguments
-    /// 
-    /// * `attr` - Any type that implements ToString; the name of the attribute
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// # use simple_xml_serialize::XMLElement;
-    /// let mut ele = XMLElement::new("name");
-    /// ele.add_empty_attr("empty");
-    /// assert_eq!(ele.to_string(), String::from("<name empty/>"));
-    /// ```
-    pub fn add_empty_attr(&mut self, attr: impl ToString) {
-        if let Some(ref mut attr_vec) = self.empty_attrs {
-            attr_vec.push(attr.to_string());
-        } else {
-            let mut attr_vec: Vec<String> = Vec::new();
-            attr_vec.push(attr.to_string());
-            self.empty_attrs = Some(attr_vec);
         }
     }
 
@@ -444,12 +396,6 @@ impl XMLElement {
                 ret.push('"');
             }
         }
-        if let Some(ref empty_attrs) = self.empty_attrs {
-            for a in empty_attrs {
-                ret.push(' ');
-                ret.push_str(&a);
-            }
-        }
         if self.contents.is_none() && self.text.is_none() {
             ret.push('/');
             ret.push('>');
@@ -545,7 +491,6 @@ mod tests {
             contents: None,
             text: None,
             attrs: None,
-            empty_attrs: None,
         };
         assert_eq!(ele1, ele2);
         ele2.text = Some(String::from("hey"));
@@ -560,7 +505,6 @@ mod tests {
             contents: None,
             text: None,
             attrs: None,
-            empty_attrs: None,
         };
         assert_eq!(newele, testele);
     }
@@ -574,7 +518,6 @@ mod tests {
             contents: None,
             text: None,
             attrs: None,
-            empty_attrs: None,
         };
         assert_eq!(ele1, ele2);
     }
@@ -588,7 +531,6 @@ mod tests {
             contents: None,
             text: None,
             attrs: None,
-            empty_attrs: None,
         };
         assert_eq!(ele1, ele2);
     }
@@ -603,7 +545,6 @@ mod tests {
             contents: None,
             text: None,
             attrs: Some(vec![test_attr]),
-            empty_attrs: None,
         };
         assert_eq!(ele1, ele2);
     }
@@ -618,38 +559,9 @@ mod tests {
             contents: None,
             text: None,
             attrs: Some(vec![test_attr]),
-            empty_attrs: None,
         };
         assert_eq!(ele1, ele2);
     }
-
-    #[test]
-    fn xmlelement_empty_attr() {
-        let ele1 = XMLElement::new("test_element").empty_attr("a1");
-        let ele2 = XMLElement{
-            name: String::from("test_element"),
-            contents: None,
-            text: None,
-            attrs: None,
-            empty_attrs: Some(vec![String::from("a1")]),
-        };
-        assert_eq!(ele1, ele2);
-    }
-
-    #[test]
-    fn xmlelement_add_empty_attr() {
-        let mut ele1 = XMLElement::new("test_element");
-        ele1.add_empty_attr("a1");
-        let ele2 = XMLElement{
-            name: String::from("test_element"),
-            contents: None,
-            text: None,
-            attrs: None,
-            empty_attrs: Some(vec![String::from("a1")]),
-        };
-        assert_eq!(ele1, ele2);
-    }
-
 
     struct Point {
         lat: f32,
@@ -674,7 +586,6 @@ mod tests {
             contents: Some(vec![point_ele]),
             text: None,
             attrs: None,
-            empty_attrs: None,
         };
         assert_eq!(ele1, ele2);
     }
@@ -690,7 +601,6 @@ mod tests {
             contents: Some(vec![point_ele]),
             text: None,
             attrs: None,
-            empty_attrs: None,
         };
         assert_eq!(ele1, ele2);
     }
@@ -707,7 +617,6 @@ mod tests {
             contents: Some(vec![point_ele1, point_ele2]),
             text: None,
             attrs: None,
-            empty_attrs: None,
         };
         assert_eq!(ele1, ele2);
     }
@@ -725,7 +634,6 @@ mod tests {
             contents: Some(vec![point_ele1, point_ele2]),
             text: None,
             attrs: None,
-            empty_attrs: None,
         };
         assert_eq!(ele1, ele2);
     }
@@ -745,7 +653,6 @@ mod tests {
             contents: Some(vec![point_ele1, point_ele2]),
             text: None,
             attrs: None,
-            empty_attrs: None,
         };
         assert_eq!(ele1, ele2);
     }
@@ -758,7 +665,6 @@ mod tests {
             contents: None,
             text: Some(String::from("some content")),
             attrs: None,
-            empty_attrs: None,
         };
         assert_eq!(ele1, ele2);
     }
@@ -772,14 +678,13 @@ mod tests {
             contents: None,
             text: Some(String::from("some content")),
             attrs: None,
-            empty_attrs: None,
         };
         assert_eq!(ele1, ele2);
     }
 
     #[test]
     fn xmlelement_to_string() {
-        let expected = r#"<test_element a1="42" a2="24" empty_attr1 empty_attr2><point lat="12.3" lon="45.6"/><point lat="32.1" lon="65.4"/>some content</test_element>"#;
+        let expected = r#"<test_element a1="42" a2="24"><point lat="12.3" lon="45.6"/><point lat="32.1" lon="65.4"/>some content</test_element>"#;
         
 
         let point_ele1: XMLElement = Point{lat: 12.3, lon: 45.6}.into();
@@ -791,7 +696,6 @@ mod tests {
             contents: Some(vec![point_ele1, point_ele2]),
             text: Some(String::from("some content")),
             attrs: Some(vec![test_attr1, test_attr2]),
-            empty_attrs: Some(vec![String::from("empty_attr1"), String::from("empty_attr2")]),
         };
 
         assert_eq!(expected, ele2.to_string());
@@ -806,7 +710,6 @@ mod tests {
             contents: None,
             text: Some(String::from("<![CDATA[1<2]]>")),
             attrs: None,
-            empty_attrs: None,
         };
 
         assert_eq!(expected, ele.to_string());
@@ -821,7 +724,6 @@ mod tests {
             contents: None,
             text: Some(String::from("1<2<![CDATA[1<2]]>1<2")),
             attrs: None,
-            empty_attrs: None,
         };
 
         assert_eq!(expected, ele.to_string());
@@ -836,7 +738,6 @@ mod tests {
             contents: None,
             text: Some(String::from("1<2")),
             attrs: None,
-            empty_attrs: None,
         };
 
         assert_eq!(expected, ele.to_string());
@@ -851,7 +752,6 @@ mod tests {
             contents: None,
             text: Some(String::from("3>2")),
             attrs: None,
-            empty_attrs: None,
         };
 
         assert_eq!(expected, ele.to_string());
@@ -865,7 +765,6 @@ mod tests {
             contents: None,
             text: Some(String::from("5&1=1")),
             attrs: None,
-            empty_attrs: None,
         };
 
         assert_eq!(expected, ele.to_string());
@@ -879,7 +778,6 @@ mod tests {
             contents: None,
             text: Some(String::from("'a")),
             attrs: None,
-            empty_attrs: None,
         };
 
         assert_eq!(expected, ele.to_string());
@@ -893,7 +791,6 @@ mod tests {
             contents: None,
             text: Some(String::from(r#""Hello World""#)),
             attrs: None,
-            empty_attrs: None,
         };
 
         assert_eq!(expected, ele.to_string());
@@ -901,7 +798,7 @@ mod tests {
 
     #[test]
     fn xmlelement_to_string_pretty1() {
-        let expected = format!(r#"<test_element a1="42" a2="24" empty_attr1 empty_attr2>{}<point lat="12.3" lon="45.6"/>{}<point lat="32.1" lon="65.4"/>{}some content{}</test_element>"#, "\n\t", "\n\t", "\n\t", "\n");
+        let expected = format!(r#"<test_element a1="42" a2="24">{}<point lat="12.3" lon="45.6"/>{}<point lat="32.1" lon="65.4"/>{}some content{}</test_element>"#, "\n\t", "\n\t", "\n\t", "\n");
 
         let point_ele1: XMLElement = Point{lat: 12.3, lon: 45.6}.into();
         let point_ele2: XMLElement = Point{lat: 32.1, lon: 65.4}.into();
@@ -912,7 +809,6 @@ mod tests {
             contents: Some(vec![point_ele1, point_ele2]),
             text: Some(String::from("some content")),
             attrs: Some(vec![test_attr1, test_attr2]),
-            empty_attrs: Some(vec![String::from("empty_attr1"), String::from("empty_attr2")]),
         };
 
         assert_eq!(expected, ele2.to_string_pretty("\n","\t"));
@@ -920,7 +816,7 @@ mod tests {
 
     #[test]
     fn xmlelement_to_string_pretty2() {
-        let expected = format!(r#"<test_element a1="42" a2="24" empty_attr1 empty_attr2>{}<point lat="12.3" lon="45.6">{}point content{}</point>{}<point lat="32.1" lon="65.4"/>{}some content{}</test_element>"#, "\n\t", "\n\t\t","\n\t","\n\t", "\n\t", "\n");
+        let expected = format!(r#"<test_element a1="42" a2="24">{}<point lat="12.3" lon="45.6">{}point content{}</point>{}<point lat="32.1" lon="65.4"/>{}some content{}</test_element>"#, "\n\t", "\n\t\t","\n\t","\n\t", "\n\t", "\n");
 
         let mut point_ele1: XMLElement = Point{lat: 12.3, lon: 45.6}.into();
         point_ele1.set_text("point content");
@@ -932,7 +828,6 @@ mod tests {
             contents: Some(vec![point_ele1, point_ele2]),
             text: Some(String::from("some content")),
             attrs: Some(vec![test_attr1, test_attr2]),
-            empty_attrs: Some(vec![String::from("empty_attr1"), String::from("empty_attr2")]),
         };
         assert_eq!(expected, ele2.to_string_pretty("\n","\t"));
     }
@@ -946,7 +841,6 @@ mod tests {
             contents: None,
             text: Some(String::from("some content")),
             attrs: None,
-            empty_attrs: None,
         };
 
         assert_eq!(expected, ele.to_string_pretty_prolog("\n","\t"));

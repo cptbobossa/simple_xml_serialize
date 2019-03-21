@@ -53,8 +53,6 @@ fn code_gen_test_complex_1() {
         lat: f32,
         #[sxs_type_attr]
         lon: f32,
-        #[sxs_type_empty_attr]
-        active: bool,
         #[sxs_type_text]
         date: String,
         #[sxs_type_element(rename="Identifier")]
@@ -71,7 +69,6 @@ fn code_gen_test_complex_1() {
         lat: f32,
         lon: f32,
         date: String,
-        active: bool,
         identifier: Name2,
     }
 
@@ -91,7 +88,6 @@ fn code_gen_test_complex_1() {
             XMLElement::new("custom_name_here")
                         .attr("latitude", p.lat)
                         .attr("lon", p.lon)
-                        .empty_attr(p.active)
                         .text(&p.date)
                         .element(&p.identifier)
         }
@@ -101,14 +97,12 @@ fn code_gen_test_complex_1() {
         lat: 43.38,
         lon: 60.11,
         date: "25 Dec 2018".to_string(),
-        active: true,
         name: Name1{val: "p1".to_string()},
     };
     let my_point2 = Point2 {
         lat: 43.38,
         lon: 60.11,
         date: "25 Dec 2018".to_string(),
-        active: true,
         identifier: Name2{val: "p1".to_string()},
     };
 
@@ -250,35 +244,6 @@ fn code_gen_test_basic_4() {
     
     #[xml_element("Employee")]
     struct Person1 {
-        #[sxs_type_empty_attr]
-        name: String,
-    }
-
-    struct Person2 {
-        name: String,
-    }
-
-    impl From<&Person2> for XMLElement {
-        fn from(p: &Person2) -> Self {
-            XMLElement::new("Employee")
-                        .empty_attr(&p.name)
-        }
-    }
-
-    let person1 = Person1{name: "Robert".to_string()};
-
-    let person2 = Person2{name: "Robert".to_string()};
-
-
-    assert_eq!(XMLElement::from(&person1), XMLElement::from(&person2));
-    assert_eq!(XMLElement::from(&person1).to_string(), XMLElement::from(&person2).to_string());
-}
-
-#[test]
-fn code_gen_test_basic_5() {
-    
-    #[xml_element("Employee")]
-    struct Person1 {
         #[sxs_type_text]
         name: String,
     }
@@ -300,4 +265,126 @@ fn code_gen_test_basic_5() {
 
     assert_eq!(XMLElement::from(&person1), XMLElement::from(&person2));
     assert_eq!(XMLElement::from(&person1).to_string(), XMLElement::from(&person2).to_string());
+}
+
+#[cfg(feature = "process_options")]
+#[test]
+fn code_gen_test_optional_attr_1() {
+    
+    #[xml_element("Employee")]
+    struct Person1 {
+        #[sxs_type_attr(rename="Name")]
+        name: Option<String>,
+        #[sxs_type_attr]
+        age: u8,
+    }
+
+    let person1 = Person1{name: None, age: 52};
+    let expected = r#"<Employee age="52"/>"#;
+    assert_eq!(XMLElement::from(&person1).to_string(), expected);
+
+
+    let person1 = Person1{name: Some("Robert".to_string()), age: 52};
+    let expected = r#"<Employee Name="Robert" age="52"/>"#;
+    assert_eq!(XMLElement::from(&person1).to_string(), expected);
+}
+
+#[cfg(feature = "process_options")]
+#[test]
+fn code_gen_test_optional_attr_2() {
+    
+    #[xml_element("Employee")]
+    struct Person1 {
+        #[sxs_type_attr(rename="Name")]
+        name: String,
+        #[sxs_type_attr]
+        age: Option<u8>,
+    }
+
+    let person1 = Person1{name: "Robert".to_string(), age: None};
+    let expected = r#"<Employee Name="Robert"/>"#;
+    assert_eq!(XMLElement::from(&person1).to_string(), expected);
+
+
+    let person1 = Person1{name: "Robert".to_string(), age: Some(52)};
+    let expected = r#"<Employee Name="Robert" age="52"/>"#;
+    assert_eq!(XMLElement::from(&person1).to_string(), expected);
+}
+
+#[cfg(feature = "process_options")]
+#[test]
+fn code_gen_test_optional_text() {
+    
+    #[xml_element("Employee")]
+    struct Person1 {
+        #[sxs_type_text]
+        name: Option<String>,
+        #[sxs_type_attr]
+        age: u8,
+    }
+
+    let person1 = Person1{name: None, age: 52};
+    let expected = r#"<Employee age="52"/>"#;
+    assert_eq!(XMLElement::from(&person1).to_string(), expected);
+
+
+    let person1 = Person1{name: Some("Robert".to_string()), age: 52};
+    let expected = r#"<Employee age="52">Robert</Employee>"#;
+    assert_eq!(XMLElement::from(&person1).to_string(), expected);
+}
+
+#[cfg(feature = "process_options")]
+#[test]
+fn code_gen_test_optional_element() {
+    
+    #[xml_element("Employee")]
+    struct Person1 {
+        #[sxs_type_element]
+        name: Option<Name>,
+        #[sxs_type_attr]
+        age: u8,
+    }
+
+    #[xml_element("Name")]
+    struct Name {
+        #[sxs_type_text]
+        name: String,
+    }
+    
+    let person1 = Person1{name: None, age: 52};
+    let expected = r#"<Employee age="52"/>"#;
+    assert_eq!(XMLElement::from(&person1).to_string(), expected);
+
+    let p1_name = Name{name:"Robert".to_string()};
+    let person1 = Person1{name: Some(p1_name), age: 52};
+    let expected = r#"<Employee age="52"><Name>Robert</Name></Employee>"#;
+    assert_eq!(XMLElement::from(&person1).to_string(), expected);
+}
+
+#[cfg(feature = "process_options")]
+#[test]
+fn code_gen_test_optional_multi_element() {
+    
+    #[xml_element("Employee")]
+    struct Person1 {
+        #[sxs_type_multi_element]
+        names: Option<Vec<Name>>,
+        #[sxs_type_attr]
+        age: u8,
+    }
+
+    #[xml_element("Name")]
+    struct Name {
+        #[sxs_type_text]
+        name: String,
+    }
+    
+    let person1 = Person1{names: None, age: 52};
+    let expected = r#"<Employee age="52"/>"#;
+    assert_eq!(XMLElement::from(&person1).to_string(), expected);
+
+    let p1_names = vec![Name{name:"Robert".to_string()}, Name{name:"Frost".to_string()}];
+    let person1 = Person1{names: Some(p1_names), age: 52};
+    let expected = r#"<Employee age="52"><Name>Robert</Name><Name>Frost</Name></Employee>"#;
+    assert_eq!(XMLElement::from(&person1).to_string(), expected);
 }
