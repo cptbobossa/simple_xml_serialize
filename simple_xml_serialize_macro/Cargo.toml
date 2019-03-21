@@ -1,6 +1,6 @@
 [package]
 name = "simple_xml_serialize_macro"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["cptbobossa <cptbobossa@protonmail.com>"]
 edition = "2018"
 readme = "README.md"
