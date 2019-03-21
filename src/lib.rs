@@ -1,11 +1,55 @@
+/*!
+# Simple XML Serialization
+This is a Rust crate for serialization of data to XML. `XMLElement`s can either be built
+manually, or the `simple_xml_serialize_macro` crate can be used to generate `From` implementations for structs. 
+
+## Example Usage
+```rust
+use simple_xml_serialize::XMLElement;
+
+fn main() {
+    // build up your XMLElement with individual calls ...
+    let mut ele = XMLElement::new("person");
+    ele.add_attr("age", 28); // accept any value that implements `ToString`.
+    ele.set_text("John Doe");
+
+    // ... or with the builder pattern
+    let sub_ele = XMLElement::new("person")
+        .attr("age", 4)
+        .text("Jane Doe");
+
+    ele.add_element(sub_ele); // `add_element` accepts values that implement `Into<XMLElement>`
+
+    let expected = r#"<person age="28"><person age="4">Jane Doe</person>John Doe</person>"#;
+    assert_eq!(expected, ele.to_string());
+    println!("{}",  ele.to_string_pretty("\n", "\t")); // specify your preferred newline and indentation for pretty printing
+
+    ele.set_text("John Doe > John Deere"); // illegal characters in text will be substituted e.g. > becomes &gt;
+    let expected = r#"<person age="28"><person age="4">Jane Doe</person>John Doe &gt; John Deere</person>"#;
+    assert_eq!(expected, ele.to_string());
+
+   
+    ele.set_text("<![CDATA[John Doe > John Deere]]>"); // illegal characters in CDATA tags are respected
+    let expected = r#"<person age="28"><person age="4">Jane Doe</person><![CDATA[John Doe > John Deere]]></person>"#;
+    assert_eq!(expected, ele.to_string());
+}
+```
+*/
+
 use std::fmt;
 
+/// The basic type this crate provides. Functions are provided for setting/adding to the fields in this struct.
+/// Any manipulation past that is left to the user by accessing the fields directly.
 #[derive(PartialEq,Debug)]
 pub struct XMLElement {
-    name: String,
-    contents: Option<Vec<XMLElement>>,
-    text: Option<String>,
-    attrs: Option<Vec<XMLAttr>>,
+    /// The tag for this element node. IE `<myelement/>`
+    pub name: String,
+    /// Nested XMLElements. IE `<myelement><nested/></myelement>`
+    pub contents: Option<Vec<XMLElement>>,
+    /// Plain character data inside of the node. IE `<myelement>hello world</myelement>`
+    pub text: Option<String>,
+    /// The key/value pairs inside of an element tag. IE `<myelement attr1="hello" attr2="world"/>`
+    pub attrs: Option<Vec<XMLAttr>>,
 }
 
 impl fmt::Display for XMLElement {
@@ -473,10 +517,11 @@ impl XMLElement {
     }
 }
 
+/// A key/value pair that is serialized inside the opening tag of an XMLElement.
 #[derive(PartialEq,Debug)]
 pub struct XMLAttr {
-    name: String,
-    value: String,
+    pub name: String,
+    pub value: String,
 }
 
 #[cfg(test)]

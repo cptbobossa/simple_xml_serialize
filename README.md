@@ -1,4 +1,4 @@
-# Simple XML Service
+# Simple XML Serialization
 This is a Rust crate for serialization of data to XML. `XMLElement`s can either be built
 manually, or the `simple_xml_serialize_macro` crate can be used to generate `From` implementations for structs. 
 
@@ -19,17 +19,17 @@ fn main() {
 
     ele.add_element(sub_ele); // `add_element` accepts values that implement `Into<XMLElement>`
 
-    let expected = r#"<person age="28" father><person age="4">Jane Doe</person>John Doe</person>"#;
+    let expected = r#"<person age="28"><person age="4">Jane Doe</person>John Doe</person>"#;
     assert_eq!(expected, ele.to_string());
     println!("{}",  ele.to_string_pretty("\n", "\t")); // specify your preferred newline and indentation for pretty printing
 
     ele.set_text("John Doe > John Deere"); // illegal characters in text will be substituted e.g. > becomes &gt;
-    let expected = r#"<person age="28" father><person age="4">Jane Doe</person>John Doe &gt; John Deere</person>"#;
+    let expected = r#"<person age="28"><person age="4">Jane Doe</person>John Doe &gt; John Deere</person>"#;
     assert_eq!(expected, ele.to_string());
 
    
     ele.set_text("<![CDATA[John Doe > John Deere]]>"); // illegal characters in CDATA tags are respected
-    let expected = r#"<person age="28" father><person age="4">Jane Doe</person><![CDATA[John Doe > John Deere]]></person>"#;
+    let expected = r#"<person age="28"><person age="4">Jane Doe</person><![CDATA[John Doe > John Deere]]></person>"#;
     assert_eq!(expected, ele.to_string());
 }
 ```
