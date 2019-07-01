@@ -40,7 +40,7 @@ use std::fmt;
 
 /// The basic type this crate provides. Functions are provided for setting/adding to the fields in this struct.
 /// Any manipulation past that is left to the user by accessing the fields directly.
-#[derive(PartialEq,Debug)]
+#[derive(Clone,PartialEq,Debug)]
 pub struct XMLElement {
     /// The tag for this element node. IE `<myelement/>`
     pub name: String,
@@ -120,6 +120,12 @@ fn split_cdata(text: &str) -> (String, Option<(String, String)>) {
     let cdata_section = String::from(&text[csi..cei]);
     let after_cdata = String::from(&text[cei..]);
     return (before_cdata, Some((cdata_section, after_cdata)));
+}
+
+impl From<&XMLElement> for XMLElement {
+    fn from(e: &XMLElement) -> Self {
+        e.clone()
+    }
 }
 
 impl XMLElement {
@@ -518,7 +524,7 @@ impl XMLElement {
 }
 
 /// A key/value pair that is serialized inside the opening tag of an XMLElement.
-#[derive(PartialEq,Debug)]
+#[derive(Clone,PartialEq,Debug)]
 pub struct XMLAttr {
     pub name: String,
     pub value: String,

@@ -1,6 +1,6 @@
 [package]
 name = "simple_xml_serialize"
-version = "0.2.1"
+version = "0.2.3"
 authors = ["cptbobossa <cptbobossa@protonmail.com>"]
 edition = "2018"
 readme = "README.md"
@@ -11,4 +11,14 @@ description = "A Rust XML serialization library"
 categories = ["encoding"]
 include = ["LICENSE", ".gitignore", "Cargo.toml", "src/*.rs"]
 
+[lib]
+bench = false
+
 [dependencies]
+
+[dev-dependencies]
+criterion = "0.2"
+
+[[bench]]
+name = "my_benchmark"
+harness = false
