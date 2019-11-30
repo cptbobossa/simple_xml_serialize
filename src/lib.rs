@@ -207,7 +207,7 @@ impl XMLElement {
     /// # Arguments
     ///
     /// * `attr` - A string slice that holds the name of the attribute
-    /// * `attr_val` - Any type that implements ToString; the value of the attribute
+    /// * `attr_val_opt` - Any type that implements ToString; the value of the attribute
     ///
     /// # Example
     ///
@@ -281,7 +281,7 @@ impl XMLElement {
     /// Builder pattern function for optionally adding an element to the contents of this XMLElement
     /// # Arguments
     ///
-    /// * `new_ele` - Any type that implements `Into<XMLElement>`
+    /// * `new_ele_opt` - Any type that implements `Into<XMLElement>`
     ///
     /// # Example
     ///
