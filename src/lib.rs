@@ -203,6 +203,26 @@ impl XMLElement {
         self
     }
 
+    /// Builder pattern function for optionally adding an attribute to the XMLElement
+    /// # Arguments
+    ///
+    /// * `attr` - A string slice that holds the name of the attribute
+    /// * `attr_val` - Any type that implements ToString; the value of the attribute
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use simple_xml_serialize::XMLElement;
+    /// let ele = XMLElement::new("name").attr_opt("my_attr", Some(1));
+    /// assert_eq!(ele.to_string(), String::from(r#"<name my_attr="1"/>"#));
+    /// let ele_none = XMLElement::new("name").attr_opt("my_attr", None);
+    /// assert_eq!(ele.to_string(), String::from(r#"<name/>"#));
+    /// ```
+    pub fn attr_opt(mut self, attr: &str, attr_val_opt: Option<impl ToString>) -> Self {
+        attr_val_opt.map(|attr_val| self.add_attr(attr, attr_val));
+        self
+    }
+
     /// Adds an attribute to the XMLElement
     /// # Arguments
     /// 
@@ -257,6 +277,32 @@ impl XMLElement {
         self.add_element(new_ele.into());
         self
     }
+
+    /// Builder pattern function for optionally adding an element to the contents of this XMLElement
+    /// # Arguments
+    ///
+    /// * `new_ele` - Any type that implements `Into<XMLElement>`
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use simple_xml_serialize::XMLElement;
+    /// struct MyPoint {}
+    /// impl From<MyPoint> for XMLElement {
+    ///     fn from(p: MyPoint) -> Self {
+    ///         XMLElement::new("point")
+    ///     }
+    /// }
+    /// let ele = XMLElement::new("name").element_opt(Some(MyPoint{}));
+    /// assert_eq!(ele.to_string(), String::from("<name><point/></name>"));
+    /// let ele_none = XMLElement::new("name").element_opt(None);
+    /// assert_eq!(ele_none.to_string(), String::from("<name/>"));
+    /// ```
+    pub fn element_opt(mut self, new_ele_opt: Option<impl Into<XMLElement>>) -> Self {
+        new_ele_opt.map(|new_ele| self.add_element(new_ele.into()));
+        self
+    }
+
 
     /// Adds an element to the contents of this XMLElement
     /// # Arguments
